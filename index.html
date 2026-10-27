@@ -1,0 +1,621 @@
+
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="description"
+    content="Discover local events, connect with people, and explore what makes our community special."
+  >
+
+  <title>Community Compass | Find Your Way to Community</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <main>
+    <div class="page">
+
+      <!-- Header and logo -->
+      <header class="site-header">
+        <a href="#home" aria-label="Community Compass home">
+          <img
+            class="logo"
+            src="images/logo.png"
+            alt="Community Compass"
+          >
+        </a>
+      </header>
+
+      <!-- Introduction -->
+      <section
+        class="hero"
+        id="home"
+        aria-labelledby="main-heading"
+      >
+       
+        <h1 id="main-heading">
+          Find Your Way to Community
+        </h1>
+
+        <p class="hero-intro">
+          Discover what’s happening nearby, connect with the people around you, and explore the places and activities that make our community special.
+        </p>
+
+        <p class="hero-supporting">
+          A community-shaped resource, growing with the people who make this
+          place what it is.
+        </p>
+
+        <div class="accent" aria-hidden="true"></div>
+      </section>
+
+      <!-- Upcoming events -->
+<section
+  class="events-section"
+  id="events"
+  aria-labelledby="events-heading"
+>
+  <div class="section-heading">
+    <p class="eyebrow">Upcoming events</p>
+
+    <h2 id="events-heading">
+      What's Happening in Our Community?
+    </h2>
+
+    <p>
+      Discover what's on and find new ways to connect with your community.
+    </p>
+  </div>
+
+        <div
+          id="events-list"
+          class="events-grid"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <p class="events-message">Loading upcoming events...</p>
+        </div>
+      </section>
+
+      <!-- Community map and directory -->
+      <section
+        class="map-section"
+        aria-labelledby="map-heading"
+      >
+        <div class="map-card">
+          <p class="eyebrow">Community Compass</p>
+
+          <h2 id="map-heading">
+            A Map of What Makes Our Community Special.
+          </h2>
+
+          
+<p>
+  Community Compass makes it easier to discover, connect and engage with the people, places, groups, activities, services and resources that make our community special.
+</p>
+
+<p>
+  Sign up to receive occasional updates as we grow. Hear about new features designed to help you explore and connect with your community.
+</p>
+
+<!-- Sign-up form -->
+<div class="signup-card">
+  <h3 id="signup-heading">Keep in touch</h3>
+
+  <form
+    action="https://api.web3forms.com/submit"
+    method="POST"
+    class="signup-form"
+  >
+    <input
+      type="hidden"
+      name="access_key"
+      value="7e668464-619a-4ff5-86f1-8d2784d96773"
+    >
+
+    <input
+      type="hidden"
+      name="subject"
+      value="Community Compass - Updates Signup"
+    >
+
+    <!-- Spam protection -->
+    <input
+      type="checkbox"
+      name="botcheck"
+      style="display:none"
+      tabindex="-1"
+      autocomplete="off"
+    >
+
+    <div class="form-row">
+      <div class="form-field">
+        <label for="signup-name">Name</label>
+        <input
+          type="text"
+          id="signup-name"
+          name="name"
+          placeholder="Your name"
+          autocomplete="name"
+          required
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="signup-email">Email address</label>
+        <input
+          type="email"
+          id="signup-email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+    </div>
+
+    <div class="consent">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          name="consent"
+          value="I consent to receiving Community Compass updates."
+          required
+        >
+        <span>
+          I'd like to receive occasional updates from Community Compass.
+        </span>
+      </label>
+    </div>
+
+    <button type="submit" class="signup-button">
+      Keep me updated
+    </button>
+
+    <p class="form-note">
+      We'll only use your details to send Community Compass updates.
+      You can unsubscribe at any time.
+    </p>
+  </form>
+</div>
+
+      </section>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <p>We acknowledge the Traditional Custodians of the lands and waters on which we live and connect. We pay our respects to Elders past and present.</p>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- CSV parser -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Community Compass events -->
+  <script>
+    /*
+      GOOGLE SHEETS CSV URL
+
+      This is the published CSV URL from your previous script.
+    */
+
+    const EVENTS_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzWkD0PtNG9hzwjUxs2OkV6Y6aNHvb1jhDmO496urfI4mVb4BWT2M-E6B2YaSzxcSztOd1eiIVSdJB/pub?gid=307861297&single=true&output=csv";
+
+    const eventList = document.getElementById("events-list");
+
+    /*
+      Map spreadsheet column headings to JavaScript field names.
+    */
+
+    const columnMap = {
+      "Timestamp": "timestamp",
+      "Event name": "title",
+      "Event date": "date",
+      "Start time": "startTime",
+      "End time": "endTime",
+      "Location": "location",
+      "Location URL": "locationUrl",
+      "Event description": "description",
+      "Organizer": "organizer",
+      "Contact e-mail": "contactEmail",
+      "URL": "url",
+      "Status": "status"
+      };
+
+    /*
+      Create HTML elements safely.
+      Spreadsheet content is inserted as text, not HTML.
+    */
+
+    function makeElement(tag, className, text) {
+      const element = document.createElement(tag);
+
+      if (className) {
+        element.className = className;
+      }
+
+      if (text !== undefined) {
+        element.textContent = text;
+      }
+
+      return element;
+    }
+
+    /*
+      Parse Australian dates in DD/MM/YYYY format.
+      Invalid dates return null.
+    */
+
+    function parseEventDate(value) {
+      if (typeof value !== "string") {
+        return null;
+      }
+
+      const match = value.trim().match(
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+      );
+
+      if (!match) {
+        return null;
+      }
+
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+
+      const date = new Date(year, month - 1, day);
+
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
+        return null;
+      }
+
+      return date;
+    }
+
+    /*
+      Format a date for the event card.
+    */
+
+    function formatDateTime(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    /*
+      Normalise spreadsheet time values for display.
+    */
+
+    function formatTime(value) {
+      return (value || "")
+        .trim()
+        .replace(
+          /^(\d{1,2}:\d{2}):\d{2}(\s*[AP]M)?$/i,
+          "$1$2"
+        );
+    }
+
+    /*
+      Create an individual event card.
+    */
+
+    function makeEventCard(event) {
+      const card = makeElement("article", "event-card");
+
+      const date = parseEventDate(event.date);
+
+      // The event list is filtered before cards are created.
+      if (!date) {
+        return card;
+      }
+
+      const dateBox = makeElement("time", "event-date");
+      dateBox.dateTime = formatDateTime(date);
+
+      dateBox.append(
+        makeElement(
+          "span",
+          "",
+          date.toLocaleDateString("en-AU", {
+            month: "short"
+          })
+        ),
+        makeElement("strong", "", String(date.getDate()))
+      );
+
+      const content = makeElement("div", "event-content");
+
+      const startTime = formatTime(event.startTime);
+      const endTime = formatTime(event.endTime);
+      const location = (event.location || "").trim();
+
+      let timeRange = "";
+
+      if (startTime && endTime) {
+        timeRange = `${startTime}–${endTime}`;
+      } else {
+        timeRange = startTime || endTime;
+      }
+
+      const metaText = [timeRange, location]
+        .filter(Boolean)
+        .join(" · ");
+
+      content.append(
+        makeElement("h4", "", (event.title || "").trim()),
+        makeElement("p", "event-meta", metaText),
+        makeElement(
+          "p",
+          "event-description",
+          (event.description || "").trim()
+        )
+      );
+
+      // Display the organiser, if provided.
+      const organizer = (event.organizer || "").trim();
+
+      if (organizer) {
+        content.append(
+          makeElement(
+            "p",
+            "event-meta",
+            `Organised by: ${organizer}`
+          )
+        );
+      }
+
+      // Display the contact email, if provided.
+      const contactEmail = (event.contactEmail || "").trim();
+
+      if (contactEmail) {
+        const emailParagraph = makeElement("p", "event-meta");
+        const emailLink = makeElement("a", "", contactEmail);
+
+        emailLink.href = `mailto:${contactEmail}`;
+
+        emailParagraph.append("Contact: ", emailLink);
+        content.append(emailParagraph);
+      }
+
+      /*
+        Only allow HTTP and HTTPS links from the spreadsheet.
+      */
+
+      const eventUrl = (event.url || "").trim();
+
+      if (eventUrl) {
+        try {
+          const url = new URL(eventUrl);
+
+          if (["https:", "http:"].includes(url.protocol)) {
+            const link = makeElement(
+              "a",
+              "button event-link",
+              "Event details ↗"
+            );
+
+            link.href = url.href;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            content.append(link);
+          }
+        } catch (error) {
+          // Ignore invalid URLs.
+        }
+      }
+    
+      // NEW: Get Directions button
+      const locationUrl = (event.locationUrl || "").trim();
+
+      if (locationUrl) {
+        try {
+          const url = new URL(locationUrl);
+
+          if (["https:", "http:"].includes(url.protocol)) {
+            const link = makeElement(
+              "a",
+              "button location-link",
+              "Get Directions ↗"
+            );
+
+            link.href = url.href;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+
+            content.append(link);
+          }
+        } catch (error) {
+          // Ignore invalid location URLs.
+        }
+      }
+
+      card.append(dateBox, content);
+
+      return card;
+    }
+
+    /*
+      Load, filter and display upcoming events.
+    */
+
+    async function loadEvents() {
+      eventList.setAttribute("aria-busy", "true");
+
+      try {
+        if (typeof Papa === "undefined") {
+          throw new Error("The CSV parser could not be loaded.");
+        }
+
+        const csvUrl = new URL(EVENTS_CSV_URL);
+
+        // Ask the browser to fetch a fresh copy.
+        csvUrl.searchParams.set("_refresh", Date.now().toString());
+
+        const response = await fetch(csvUrl, {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not load events (HTTP ${response.status}).`
+          );
+        }
+
+        const csv = await response.text();
+
+        const result = Papa.parse(csv, {
+          header: true,
+          skipEmptyLines: true,
+
+          transformHeader: header => {
+            const name = header
+              .trim()
+              .replace(/^\uFEFF/, "");
+
+            return columnMap[name] || name;
+          }
+        });
+
+        if (result.errors.length > 0) {
+          console.warn(
+            "Some CSV rows could not be parsed:",
+            result.errors
+          );
+        }
+
+        /*
+          Confirm that the CSV contains the expected headings.
+        */
+
+        const fields = result.meta.fields || [];
+
+        const requiredColumns = [
+          "title",
+          "date",
+          "status"
+        ];
+
+        const missingColumns = requiredColumns.filter(
+          column => !fields.includes(column)
+        );
+
+        if (missingColumns.length > 0) {
+          throw new Error(
+            "The CSV is missing expected columns: " +
+            missingColumns.join(", ")
+          );
+        }
+
+        /*
+          Compare calendar dates in the visitor's local timezone.
+          Events happening today remain visible.
+        */
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const events = result.data
+          .filter(event => {
+            const status = (event.status || "")
+              .trim()
+              .toLowerCase();
+
+            if (status !== "published") {
+              return false;
+            }
+
+            if (!(event.title || "").trim()) {
+              return false;
+            }
+
+            const date = parseEventDate(event.date);
+
+            if (!date) {
+              return false;
+            }
+
+            date.setHours(0, 0, 0, 0);
+
+            return date >= today;
+          })
+          .sort((a, b) => {
+            return (
+              parseEventDate(a.date) -
+              parseEventDate(b.date)
+            );
+          });
+
+        /*
+          Clear the loading message before displaying results.
+        */
+
+        eventList.replaceChildren();
+
+        if (events.length === 0) {
+          eventList.append(
+            makeElement(
+              "p",
+              "events-message",
+              "No upcoming events just yet. Check back soon!"
+            )
+          );
+
+          return;
+        }
+
+        /*
+          Build the event cards and add them to the page.
+        */
+
+        const fragment = document.createDocumentFragment();
+
+        events.forEach(event => {
+          fragment.append(makeEventCard(event));
+        });
+
+        eventList.append(fragment);
+
+      } catch (error) {
+        console.error(
+          "Community Compass events error:",
+          error
+        );
+
+        eventList.replaceChildren(
+          makeElement(
+            "p",
+            "events-message",
+            "We couldn't load upcoming events just now. Please try again later."
+          )
+        );
+
+      } finally {
+        eventList.setAttribute("aria-busy", "false");
+      }
+    }
+
+    loadEvents();
+  </script>
+
+</body>
+</html>
